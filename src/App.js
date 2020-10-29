@@ -26,22 +26,24 @@ export default function App() {
   const [repos, setRepos] = useState([]);
 
   async function handleLikeRepository(id) {
-    console.log(id);
-    const res = await api.post(`repositories/${id}/like`);
-    const repoLiked = res.data;
-    setRepos([...repos.filter((repo) => repo.id !== id), repoLiked]);
+    const { data: repoLiked } = await api.post(`repositories/${id}/like`);
+
+    let newReposArray = repos.slice();
+    const repoLikedIndex = repos.findIndex((repo) => repo.id === id);
+    newReposArray.splice(repoLikedIndex, 1, repoLiked);
+
+    setRepos(newReposArray);
   }
 
   useEffect(() => {
     async function setAndLoadRepos() {
-      const response1 = await api
+      const { data: repo01 } = await api
         .post('repositories', repo1)
         .catch((err) => err.response);
-      const response2 = await api
+      const { data: repo02 } = await api
         .post('repositories', repo2)
         .catch((err) => err.response);
-      if (!response1.data.error && !response2.data.error)
-        setRepos([...repos, response1.data, response2.data]);
+      if (!repo01.error && !repo02.error) setRepos([...repos, repo01, repo02]);
     }
 
     api.get('repositories').then((res) => setRepos(res.data));
