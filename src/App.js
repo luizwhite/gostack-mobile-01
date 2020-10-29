@@ -34,17 +34,17 @@ export default function App() {
 
   useEffect(() => {
     async function setAndLoadRepos() {
-      await api
+      const response1 = await api
         .post('repositories', repo1)
-        .catch((err) => console.log(JSON.stringify(err.response.data.error)));
-      await api
+        .catch((err) => err.response);
+      const response2 = await api
         .post('repositories', repo2)
-        .catch((err) => console.log(JSON.stringify(err.response.data.error)));
-      await api.get('repositories').then((res) => {
-        setRepos(res.data);
-      });
+        .catch((err) => err.response);
+      if (!response1.data.error && !response2.data.error)
+        setRepos([...repos, response1.data, response2.data]);
     }
 
+    api.get('repositories').then((res) => setRepos(res.data));
     setAndLoadRepos();
   }, []);
 
